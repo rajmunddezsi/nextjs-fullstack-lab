@@ -1,10 +1,12 @@
 # Next.js Full-Stack Lab
 
-A sandbox project for learning and practicing production oriented Next.js, frontend and full-stack development concepts.
+A sandbox project for learning and practicing production-oriented Next.js, frontend and full-stack development concepts.
 
-This repository is intentionally used as a learning environment. The goal is to explore architecture, data flow, testing, authentication, database integration and other production oriented patterns before applying them in a separate portfolio project.
+This repository is intentionally used as a learning environment. The goal is to explore architecture, data flow, testing, authentication, database integration and other production-oriented patterns before applying them in a separate portfolio project.
 
 There is intentionally no CSS or visual styling in this repository, because the focus is on architecture, application logic and full-stack concepts rather than UI polish.
+
+Authentication currently supports OAuth sign-in with Google and GitHub using Auth.js and the Prisma Adapter.
 
 ## Tech Stack
 
@@ -46,11 +48,11 @@ Implemented so far:
 - Auth.js base setup
 - Prisma Auth.js adapter
 - Auth database models
+- Google OAuth
+- GitHub OAuth
 
 In progress / upcoming:
 
-- Google OAuth
-- GitHub OAuth
 - Sessions
 - Protected routes
 - Role-Based Access Control (RBAC)
@@ -74,7 +76,7 @@ It intentionally contains:
 - architecture exercises
 - Git and pull request practice
 
-After completing the learning roadmap, the concepts and patterns practiced here will be applied in a separate portfolio project: a production oriented Admin Dashboard built from a clean repository.
+After completing the learning roadmap, the concepts and patterns practiced here will be applied in a separate portfolio project: a production-oriented Admin Dashboard built from scratch in a clean repository.
 
 ## Requirements
 
@@ -99,6 +101,12 @@ Example:
 ```env
 DATABASE_URL="postgresql://username@localhost:5432/database_name?schema=public"
 AUTH_SECRET="your-generated-auth-secret"
+
+AUTH_GOOGLE_ID="your-google-client-id"
+AUTH_GOOGLE_SECRET="your-google-client-secret"
+
+AUTH_GITHUB_ID="your-github-client-id"
+AUTH_GITHUB_SECRET="your-github-client-secret"
 ```
 
 Do not commit real credentials or secrets.
@@ -212,7 +220,10 @@ Current Auth.js database models:
 - Session
 - VerificationToken
 
-OAuth providers will be added in later learning blocks.
+Configured OAuth providers:
+
+- Google
+- GitHub
 
 ## Database Architecture
 
@@ -331,29 +342,43 @@ chore:
 
 ## Learning Roadmap
 
-Current roadmap:
+Legend: ✅ Completed · 🚧 In progress · ⏳ Upcoming
 
 ```text
-14. PostgreSQL + Prisma + real Data Layer
-15. Authentication with Auth.js / NextAuth.js
-16. OAuth — Google + GitHub
-17. Session + Protected Routes
-18. RBAC — USER / ADMIN
-19. User Management
-20. Route Handlers + own API
-21. Caching + Revalidation + use cache
-22. Parallel Data Fetching + Waterfall Optimization
-23. Advanced Suspense + Streaming Architecture
-24. Start Portfolio Admin Dashboard — new clean repository
-25. Component / Integration Testing
-26. Mocking + API Testing
-27. Playwright E2E
-28. Performance + Bundle + Rendering Optimization
-29. Security + Authorization Hardening
-30. Production Error Handling + Logging
-31. Vercel Deployment + Environment Variables
-32. Final Architecture Review + Refactor
-33. Portfolio Polish + Release
+✅ 1. Project Structure + App Router Basics
+✅ 2. Server vs Client Components
+✅ 2.5. Testing Foundation — Vitest + React Testing Library
+✅ 3. Data Fetching + Server Component Data Flow
+✅ 4. Suspense + Streaming
+✅ 5. Error Handling + error.tsx
+✅ 6. Dynamic Routes + params + notFound()
+✅ 7. Search + URL State + searchParams + Debounce
+✅ 8. Pagination + Sorting
+✅ 9. Forms + Server Actions
+✅ 10. Zod Validation + Form Errors
+✅ 11. CRUD — Edit, Update, Delete
+✅ 12. Advanced Server Actions — bind(), Programmatic Actions, useTransition
+✅ 13. Optimistic UI + useOptimistic
+✅ 14. PostgreSQL + Prisma + Real Data Layer
+✅ 15. Authentication with Auth.js / NextAuth.js
+✅ 16. OAuth — Google + GitHub
+🚧 17. Session + Protected Routes
+⏳ 18. RBAC — USER / ADMIN
+⏳ 19. User Management
+⏳ 20. Route Handlers + Own API
+⏳ 21. Caching + Revalidation + use cache
+⏳ 22. Parallel Data Fetching + Waterfall Optimization
+⏳ 23. Advanced Suspense + Streaming Architecture
+⏳ 24. Start Portfolio Admin Dashboard — New Clean Repository
+⏳ 25. Component / Integration Testing
+⏳ 26. Mocking + API Testing
+⏳ 27. Playwright E2E
+⏳ 28. Performance + Bundle + Rendering Optimization
+⏳ 29. Security + Authorization Hardening
+⏳ 30. Production Error Handling + Logging
+⏳ 31. Vercel Deployment + Environment Variables
+⏳ 32. Final Architecture Review + Refactor
+⏳ 33. Portfolio Polish + Release
 ```
 
 ## Notes
