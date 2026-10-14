@@ -1,5 +1,14 @@
+import { auth } from "@/auth";
 import PageTitle from "@/components/ui/PageTitle";
 
-export default function DashboardPage() {
-  return <PageTitle title="Dashboard" />;
+export default async function DashboardPage() {
+  const session = await auth();
+
+  return (
+    <main>
+      <PageTitle title="Dashboard" />
+      Welcome, {session?.user?.name ?? "?"}! Your email is:{" "}
+      {session?.user?.email ?? "?"}
+    </main>
+  );
 }

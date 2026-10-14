@@ -4,4 +4,7 @@ import prisma from "@/lib/prisma";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 
-export const {handlers, auth, signIn, signOut} = NextAuth({adapter: PrismaAdapter(prisma), providers: [Google, GitHub]})
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
+  providers: [Google, GitHub],
+});
