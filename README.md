@@ -362,8 +362,8 @@ Legend: ✅ Completed · 🚧 In progress · ⏳ Upcoming
 ✅ 14. PostgreSQL + Prisma + Real Data Layer
 ✅ 15. Authentication with Auth.js / NextAuth.js
 ✅ 16. OAuth — Google + GitHub
-🚧 17. Session + Protected Routes
-⏳ 18. RBAC — USER / ADMIN
+✅ 17. Session + Protected Routes
+🚧 18. RBAC — USER / ADMIN
 ⏳ 19. User Management
 ⏳ 20. Route Handlers + Own API
 ⏳ 21. Caching + Revalidation + use cache
