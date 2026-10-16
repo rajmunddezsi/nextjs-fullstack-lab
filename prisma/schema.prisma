@@ -12,6 +12,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model Product {
   id                 Int      @id @default(autoincrement())
   title              String
@@ -32,6 +37,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?
+  role          Role      @default(USER)
 
   accounts Account[]
   sessions Session[]
