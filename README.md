@@ -50,12 +50,12 @@ Implemented so far:
 - Auth database models
 - Google OAuth
 - GitHub OAuth
+- Session-based route protection
+- Role-Based Access Control (RBAC)
+- USER / ADMIN authorization
 
 In progress / upcoming:
 
-- Sessions
-- Protected routes
-- Role-Based Access Control (RBAC)
 - User management
 - Route Handlers and custom API
 - Caching and revalidation
@@ -225,6 +225,12 @@ Configured OAuth providers:
 - Google
 - GitHub
 
+Current authorization setup includes:
+
+- Session-based protected routes
+- USER and ADMIN roles
+- Server-side role checks with Auth.js
+
 ## Database Architecture
 
 High-level data flow:
@@ -363,8 +369,8 @@ Legend: ✅ Completed · 🚧 In progress · ⏳ Upcoming
 ✅ 15. Authentication with Auth.js / NextAuth.js
 ✅ 16. OAuth — Google + GitHub
 ✅ 17. Session + Protected Routes
-🚧 18. RBAC — USER / ADMIN
-⏳ 19. User Management
+✅ 18. RBAC — USER / ADMIN
+🚧 19. User Management
 ⏳ 20. Route Handlers + Own API
 ⏳ 21. Caching + Revalidation + use cache
 ⏳ 22. Parallel Data Fetching + Waterfall Optimization
