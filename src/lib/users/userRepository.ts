@@ -32,3 +32,21 @@ export async function getUserByEmail(email: string) {
     },
   });
 }
+
+export async function softDeleteUserRecord(userId: string) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.update({
+      where: { id: userId },
+      data: {
+        deletedAt: new Date(),
+        active: false,
+      },
+    });
+
+    await tx.session.deleteMany({
+      where: { userId },
+    });
+
+    return user;
+  });
+}
