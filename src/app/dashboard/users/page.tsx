@@ -3,6 +3,7 @@ import { Role } from "@/generated/prisma/enums";
 import { getUsers } from "@/lib/users/getUsers";
 import { redirect } from "next/navigation";
 import UserSearch from "./_components/search/UserSearch";
+import UserRoleSelect from "./_components/UserRoleSelect";
 
 interface UsersPageProps {
   searchParams: Promise<{
@@ -67,7 +68,13 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
               <tr key={user.id}>
                 <td>{user.name || "-"}</td>
                 <td>{user.email || "-"}</td>
-                <td>{user.role}</td>
+                <td>
+                  <UserRoleSelect
+                    userId={user.id}
+                    role={user.role}
+                    disabled={session.user.id === user.id}
+                  />
+                </td>
                 <td>{user.active ? "Active" : "Inactive"}</td>
               </tr>
             ))}
