@@ -1,4 +1,4 @@
-import type { Role, User } from "@/generated/prisma/client";
+import type { Role } from "@/generated/prisma/client";
 import prisma from "../prisma";
 
 export async function getUsers(
