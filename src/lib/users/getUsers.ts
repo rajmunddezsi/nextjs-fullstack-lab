@@ -12,9 +12,10 @@ export async function getUsers(
       name: true,
       email: true,
       role: true,
-      active: true
+      active: true,
     },
     where: {
+      deletedAt: null,
       ...(active !== undefined && { active: { equals: active } }),
       ...(role && { role: { equals: role } }),
       ...(query && {
