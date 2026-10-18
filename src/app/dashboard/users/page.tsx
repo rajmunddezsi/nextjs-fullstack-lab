@@ -4,6 +4,7 @@ import { getUsers } from "@/lib/users/getUsers";
 import { redirect } from "next/navigation";
 import UserSearch from "./_components/search/UserSearch";
 import UserRoleSelect from "./_components/UserRoleSelect";
+import UserStatusButton from "./_components/UserStatusButton";
 
 interface UsersPageProps {
   searchParams: Promise<{
@@ -75,7 +76,13 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
                     disabled={session.user.id === user.id}
                   />
                 </td>
-                <td>{user.active ? "Active" : "Inactive"}</td>
+                <td>
+                  <UserStatusButton
+                    userId={user.id}
+                    active={user.active}
+                    disabled={session.user.id === user.id}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
