@@ -50,3 +50,10 @@ export async function softDeleteUserRecord(userId: string) {
     return user;
   });
 }
+
+export async function restoreUserRecord(id: string) {
+  return prisma.user.update({
+    where: { id },
+    data: { deletedAt: null },
+  });
+}

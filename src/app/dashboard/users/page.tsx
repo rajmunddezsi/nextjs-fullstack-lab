@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import UserSearch from "./_components/search/UserSearch";
 import UserRoleSelect from "./_components/UserRoleSelect";
 import UserStatusButton from "./_components/UserStatusButton";
+import UserDeleteButton from "./_components/UserDeleteButton";
 
 interface UsersPageProps {
   searchParams: Promise<{
@@ -61,7 +62,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
-              <th>Status</th>
+              <th colSpan={2}>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -81,6 +82,12 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
                     userId={user.id}
                     active={user.active}
                     disabled={session.user.id === user.id}
+                  />
+                </td>
+                <td>
+                  <UserDeleteButton
+                    userId={user.id}
+                    disbaled={session.user.id === user.id}
                   />
                 </td>
               </tr>

@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { Role, type Role as RoleType } from "@/generated/prisma/enums";
 import z from "zod";
 import {
+  restoreUserRecord,
   softDeleteUserRecord,
   updateUserRoleRecord,
   updateUserStatusRecord,
@@ -83,7 +84,7 @@ export async function updateUserStatus(userId: string, active: boolean) {
   revalidatePath("/dashboard/users");
 }
 
-const softDeleteUserSchema = z.object({
+const userIdSchema = z.object({
   userId: z.string().min(1),
 });
 
@@ -102,7 +103,7 @@ export async function softDeleteUser(userId: string) {
     throw new Error("Users cannot delete their own account!");
   }
 
-  const validatedFields = softDeleteUserSchema.safeParse({
+  const validatedFields = userIdSchema.safeParse({
     userId,
   });
 
@@ -115,4 +116,32 @@ export async function softDeleteUser(userId: string) {
   await softDeleteUserRecord(validatedUserId);
 
   revalidatePath("/dashboard/users");
+}
+
+export async function restoreUser(id: string) {
+
+  const session = await auth();
+
+  if (!session) {
+    throw new Error("Unauthorized!");
+  }
+
+  if (session.user.role !== Role.ADMIN) {
+    throw new Error("Forbidden!");
+  }
+
+  const validatedFields = userIdSchema.safeParse({
+    userId: id,
+  });
+
+  if (!validatedFields.success) {
+    throw new Error("Invalid fields!");
+  }
+
+  const { userId } = validatedFields.data;
+
+  await restoreUserRecord(userId);
+
+  revalidatePath("/dashboard/users");
+  revalidatePath("/dashboard/users/archived");
 }
