@@ -1,8 +1,14 @@
 import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
 
-export default async function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<{ error?: string | string[] }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const session = await auth();
+  const params = await searchParams;
+  const error = Array.isArray(params.error) ? params.error[0] : params.error;
 
   if (session) {
     redirect("/dashboard");
@@ -31,6 +37,12 @@ export default async function LoginPage() {
       <form action={githubLoginAction}>
         <button type="submit">Login with Github</button>
       </form>
+
+      {error === "inactive" && (
+        <div>
+          Your account has been deactivated. Please contact an administrator.
+        </div>
+      )}
     </main>
   );
 }

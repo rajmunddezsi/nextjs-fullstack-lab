@@ -3,11 +3,32 @@ import prisma from "../prisma";
 
 export async function updateUserRoleRecord(id: string, role: Role) {
   return prisma.user.update({
-    where: {
-      id,
-    },
-    data: {
-      role,
+    where: { id },
+    data: { role },
+  });
+}
+
+export async function updateUserStatusRecord(id: string, active: boolean) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.update({
+      where: { id },
+      data: { active },
+    });
+
+    if (!active) {
+      await tx.session.deleteMany({ where: { userId: id } });
+    }
+
+    return user;
+  });
+}
+
+export async function getUserByEmail(email: string) {
+  return prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      active: true,
     },
   });
 }
