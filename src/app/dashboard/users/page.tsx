@@ -6,6 +6,7 @@ import UserSearch from "./_components/search/UserSearch";
 import UserRoleSelect from "./_components/UserRoleSelect";
 import UserStatusButton from "./_components/UserStatusButton";
 import UserDeleteButton from "./_components/UserDeleteButton";
+import InviteUserForm from "./_components/InviteUserForm";
 
 interface UsersPageProps {
   searchParams: Promise<{
@@ -52,6 +53,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
   return (
     <main>
       <h1>Users</h1>
+      <InviteUserForm />
       <UserSearch />
       {users.length === 0 ? (
         <div>No users.</div>
