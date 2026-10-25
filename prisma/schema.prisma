@@ -17,6 +17,12 @@ enum Role {
   ADMIN
 }
 
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+}
+
 model Product {
   id                 Int      @id @default(autoincrement())
   title              String
@@ -32,19 +38,20 @@ model Product {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  role          Role      @default(USER)
-  active        Boolean   @default(true)
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
+  id                 String       @id @default(cuid())
+  name               String?
+  email              String?      @unique
+  emailVerified      DateTime?    @map("email_verified")
+  image              String?
+  role               Role         @default(USER)
+  active             Boolean      @default(true)
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @default(now()) @updatedAt @map("updated_at")
+  deletedAt          DateTime?    @map("deleted_at")
+  invitationsCreated Invitation[] @relation("InvitationsCreated")
 
-  accounts Account[]
-  sessions Session[]
+  accounts    Account[]
+  sessions    Session[]
 
   @@map("users")
 }
@@ -87,4 +94,20 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model Invitation {
+  id         String           @id @default(cuid())
+  email      String           @unique
+  role       Role             @default(USER)
+  status     InvitationStatus @default(PENDING)
+  expiresAt  DateTime         @map("expires_at")
+  acceptedAt DateTime?        @map("accepted_at")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  invitedById String  @map("invited_by_id")
+  invitedBy   User    @relation("InvitationsCreated", fields: [invitedById], references: [id])
+
+  @@map("invitations")
 }

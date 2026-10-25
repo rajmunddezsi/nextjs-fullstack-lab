@@ -1,15 +1,26 @@
 "use server";
 
 import { auth } from "@/auth";
-import { Role, type Role as RoleType } from "@/generated/prisma/enums";
+import {
+  InvitationStatus,
+  Role,
+  type Role as RoleType,
+} from "@/generated/prisma/enums";
 import z from "zod";
 import {
+  getUserByEmail,
   restoreUserRecord,
   softDeleteUserRecord,
   updateUserRoleRecord,
   updateUserStatusRecord,
 } from "@/lib/users/userRepository";
 import { revalidatePath } from "next/cache";
+import {
+  createInvitationRecord,
+  getInvitationByEmail,
+  renewInvitationRecord,
+} from "@/lib/invitations/invitationRepository";
+import type { InvitationFormState } from "@/lib/users/types";
 
 const updateRoleSchema = z.object({
   id: z.string().min(1),
@@ -119,7 +130,6 @@ export async function softDeleteUser(userId: string) {
 }
 
 export async function restoreUser(id: string) {
-
   const session = await auth();
 
   if (!session) {
@@ -144,4 +154,105 @@ export async function restoreUser(id: string) {
 
   revalidatePath("/dashboard/users");
   revalidatePath("/dashboard/users/archived");
+}
+
+const createInvitationSchema = z.object({
+  email: z.email().trim(),
+  role: z.enum(Role),
+});
+
+export async function createInvitation(
+  _: InvitationFormState,
+  formData: FormData,
+): Promise<InvitationFormState> {
+  const session = await auth();
+
+  if (!session) {
+    throw new Error("Unauthenticated!");
+  }
+
+  if (session.user.role !== Role.ADMIN) {
+    throw new Error("Forbidden!");
+  }
+
+  const validatedFields = createInvitationSchema.safeParse({
+    email: formData.get("email"),
+    role: formData.get("role"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: "Invalid field(s)",
+      errors: z.flattenError(validatedFields.error).fieldErrors,
+    };
+  }
+
+  let message = "";
+  const { email, role } = validatedFields.data;
+  const normalizedEmail = email.toLowerCase();
+  const now = new Date();
+  const expiresAt = new Date(now);
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  const existingUser = await getUserByEmail(normalizedEmail);
+
+  if (existingUser) {
+    return {
+      success: false,
+      message: "A user with this email already exists!",
+    };
+  }
+
+  const existingInvitation = await getInvitationByEmail(normalizedEmail);
+
+  if (!existingInvitation) {
+    await createInvitationRecord(
+      normalizedEmail,
+      role,
+      expiresAt,
+      session.user.id,
+    );
+
+    message = "Invitation created successfully!";
+  } else {
+    if (existingInvitation.status === InvitationStatus.ACCEPTED) {
+      return {
+        success: false,
+        message: "This invitation has already been accepted.",
+      };
+    }
+
+    if (
+      existingInvitation.status === InvitationStatus.PENDING &&
+      existingInvitation.expiresAt > now
+    ) {
+      return {
+        success: false,
+        message: "An active invitation already exists for this email.",
+      };
+    }
+
+    if (
+      existingInvitation.status === InvitationStatus.REVOKED ||
+      (existingInvitation.status === InvitationStatus.PENDING &&
+        existingInvitation.expiresAt <= now)
+    ) {
+      await renewInvitationRecord(
+        normalizedEmail,
+        role,
+        expiresAt,
+        session.user.id,
+      );
+
+      message = "Invitation has been renewed successfully!";
+    }
+  }
+
+  revalidatePath("/dashboard/users");
+
+  return {
+    success: true,
+    message: message,
+  };
 }
