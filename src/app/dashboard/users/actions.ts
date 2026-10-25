@@ -19,6 +19,7 @@ import {
   createInvitationRecord,
   getInvitationByEmail,
   renewInvitationRecord,
+  revokeInvitationRecord,
 } from "@/lib/invitations/invitationRepository";
 import type { InvitationFormState } from "@/lib/users/types";
 
@@ -255,4 +256,49 @@ export async function createInvitation(
     success: true,
     message: message,
   };
+}
+
+const revokeInvitationSchema = z.object({
+  email: z.email().trim(),
+});
+
+export async function revokeInvitation(email: string) {
+  const session = await auth();
+
+  if (!session) {
+    throw new Error("Unauthenticated!");
+  }
+
+  if (session.user.role !== Role.ADMIN) {
+    throw new Error("Forbidden!");
+  }
+
+  const validatedFields = revokeInvitationSchema.safeParse({
+    email,
+  });
+
+  if (!validatedFields.success) {
+    throw new Error("Invalid field(s)");
+  }
+
+  const { email: validatedEmail } = validatedFields.data;
+  const normalizedEmail = validatedEmail.toLowerCase();
+  const now = new Date();
+
+  const existedInvitation = await getInvitationByEmail(normalizedEmail);
+
+  if (!existedInvitation) {
+    throw new Error("Invitation not found!");
+  }
+
+  if (
+    existedInvitation.status !== InvitationStatus.PENDING ||
+    existedInvitation.expiresAt <= now
+  ) {
+    throw new Error("Only active pending invitations can be revoked.");
+  }
+
+  await revokeInvitationRecord(normalizedEmail);
+
+  revalidatePath("/dashboard/users/invitations");
 }
