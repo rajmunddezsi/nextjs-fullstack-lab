@@ -4,13 +4,26 @@ import prisma from "@/lib/prisma";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import { getUserByEmail } from "@/lib/users/userRepository";
-import { getInvitationByEmail } from "./lib/invitations/invitationRepository";
+import {
+  acceptInvitationForUser,
+  getInvitationByEmail,
+} from "./lib/invitations/invitationRepository";
 import { InvitationStatus } from "./generated/prisma/enums";
-import { Invitation } from "./generated/prisma/client";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [Google, GitHub],
+  events: {
+    async createUser({ user }) {
+      if (!user.id || !user.email) {
+        throw new Error("Created user is missing an id or email.");
+      }
+
+      const normalizedEmail = user.email.trim().toLowerCase();
+
+      await acceptInvitationForUser(user.id, normalizedEmail);
+    },
+  },
   callbacks: {
     session({ session, user }) {
       session.user.id = user.id;
