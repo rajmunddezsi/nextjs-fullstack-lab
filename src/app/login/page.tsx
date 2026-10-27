@@ -5,10 +5,19 @@ interface LoginPageProps {
   searchParams: Promise<{ error?: string | string[] }>;
 }
 
+const errorMessages: Record<string, string> = {
+  inactive: "Your account has been deactivated.",
+  "no-invitation": "You don't have an invitation to this application.",
+  "invitation-expired": "Your invitation has expired.",
+  "invitation-invalid": "Your invitation is no longer valid.",
+};
+
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const session = await auth();
   const params = await searchParams;
   const error = Array.isArray(params.error) ? params.error[0] : params.error;
+
+  const errorMessage = error ? errorMessages[error] : undefined;
 
   if (session) {
     redirect("/dashboard");
@@ -35,14 +44,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       </form>
 
       <form action={githubLoginAction}>
-        <button type="submit">Login with Github</button>
+        <button type="submit">Login with GitHub</button>
       </form>
 
-      {error === "inactive" && (
-        <div>
-          Your account has been deactivated. Please contact an administrator.
-        </div>
-      )}
+      {errorMessage && <div>{errorMessage}</div>}
     </main>
   );
 }
