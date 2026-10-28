@@ -1,21 +1,20 @@
 # Next.js Full-Stack Lab
 
-A sandbox project for learning and practicing production-oriented Next.js, frontend and full-stack development concepts.
+A sandbox project for learning and practicing production-oriented Next.js, React, TypeScript, and full-stack development concepts.
 
-This repository is intentionally used as a learning environment. The goal is to explore architecture, data flow, testing, authentication, database integration and other production-oriented patterns before applying them in a separate portfolio project.
+This repository serves as a learning environment for exploring application architecture, data flow, testing, authentication, authorization, database integration, API development, and caching before applying these concepts in a separate portfolio project.
 
-There is intentionally no CSS or visual styling in this repository, because the focus is on architecture, application logic and full-stack concepts rather than UI polish.
-
-Authentication currently supports OAuth sign-in with Google and GitHub using Auth.js and the Prisma Adapter.
+There is intentionally no CSS or visual styling in this repository. The focus is on architecture, application logic, security fundamentals, and full-stack engineering rather than UI polish.
 
 ## Tech Stack
 
-- Next.js
-- React
+- Next.js 16 (App Router)
+- React 19
 - TypeScript
 - PostgreSQL
 - Prisma ORM
 - Auth.js / NextAuth.js
+- Google and GitHub OAuth
 - Zod
 - Vitest
 - React Testing Library
@@ -23,44 +22,98 @@ Authentication currently supports OAuth sign-in with Google and GitHub using Aut
 
 ## Current Learning Scope
 
-Implemented so far:
+### Implemented
+
+**Next.js and React**
 
 - App Router
 - Server and Client Components
 - Dynamic routes
 - Search with URL state
-- Filtering
-- Sorting
+- Filtering and sorting
 - Pagination
 - Suspense and streaming
 - Error handling
 - Forms and Server Actions
-- Zod validation
-- CRUD operations
 - Advanced Server Actions
-- Optimistic UI
-- PostgreSQL
+- React transitions and Optimistic UI
+
+**Database and Architecture**
+
+- PostgreSQL integration
 - Prisma ORM
-- Database migrations
-- Database seeding
+- Database migrations and seeding
 - Prisma Studio
 - Data Layer / Repository pattern
-- Auth.js base setup
-- Prisma Auth.js adapter
-- Auth database models
-- Google OAuth
-- GitHub OAuth
-- Session-based route protection
+- Service layer for shared business logic
+- Prisma transactions
+- CRUD operations
+- Soft deletion and restoration
+
+**Authentication and Authorization**
+
+- Auth.js with Prisma Adapter
+- Google and GitHub OAuth
+- Database-backed sessions
+- Session-based protected routes
 - Role-Based Access Control (RBAC)
 - USER / ADMIN authorization
+- Account activation and deactivation
+- Session revocation
 
-In progress / upcoming:
+**User Management**
 
-- User management
-- Route Handlers and custom API
-- Caching and revalidation
-- Parallel data fetching
+- User listing, search, and filtering
+- User role management
+- User activation and deactivation
+- Soft delete and restore
+- Invitation creation and renewal
+- Invitation listing and revocation
+- Invitation expiration validation
+- Invitation-only OAuth registration
+- First-login onboarding
+- Automatic role assignment from invitations
+- Login error handling
+
+**Route Handlers and API**
+
+- HTTP GET, POST, PATCH, and DELETE methods
+- Dynamic API routes
+- Route and query parameters
+- JSON request and response handling
+- Zod request validation
+- HTTP status codes
+- Authentication and authorization for API endpoints
+- Shared service logic between Server Actions and Route Handlers
+
+**Caching and Revalidation**
+
+- Next.js Cache Components
+- `use cache`
+- `cacheLife()`
+- `cacheTag()`
+- `updateTag()`
+- `revalidatePath()`
+- Cache invalidation for product lists and individual products
+- `revalidateTag()` and stale-while-revalidate concepts
+
+**Testing**
+
+- Vitest
+- React Testing Library
+- jsdom
+- jest-dom
+- user-event
+
+### Upcoming
+
+- Parallel data fetching and waterfall optimization
 - Advanced Suspense and streaming architecture
+- Portfolio Admin Dashboard
+- Advanced testing
+- Performance optimization
+- Security hardening
+- Deployment and production architecture
 
 ## Project Purpose
 
@@ -68,19 +121,19 @@ This repository is a learning sandbox used to practice and understand modern Nex
 
 It intentionally contains:
 
-- learning exercises
-- refactors
-- testing practice
-- experimental branches
-- implementation iterations
-- architecture exercises
+- Learning exercises
+- Refactors
+- Testing practice
+- Experimental branches
+- Implementation iterations
+- Architecture exercises
 - Git and pull request practice
 
-After completing the learning roadmap, the concepts and patterns practiced here will be applied in a separate portfolio project: a production-oriented Admin Dashboard built from scratch in a clean repository.
+After completing the initial learning roadmap, the concepts and patterns practiced here will be applied in a separate portfolio project: a production-oriented Admin Dashboard built from scratch in a clean repository.
 
 ## Requirements
 
-Before running the project locally, make sure the following are installed:
+Before running the project locally, install:
 
 - Node.js
 - pnpm
@@ -109,13 +162,13 @@ AUTH_GITHUB_ID="your-github-client-id"
 AUTH_GITHUB_SECRET="your-github-client-secret"
 ```
 
-Do not commit real credentials or secrets.
+Never commit real credentials or secrets.
 
 Make sure `.env` is included in `.gitignore`.
 
 ## PostgreSQL
 
-The project uses PostgreSQL as the database.
+The project uses PostgreSQL as its relational database.
 
 For local development, create a PostgreSQL database and update `DATABASE_URL` in `.env`.
 
@@ -173,11 +226,7 @@ Start the application:
 pnpm dev
 ```
 
-Then open:
-
-```text
-http://localhost:3000
-```
+Then open: http://localhost:3000
 
 ## Testing
 
@@ -193,117 +242,306 @@ Run tests once:
 pnpm test:run
 ```
 
-The project uses:
-
-- Vitest
-- React Testing Library
-- jsdom
-- jest-dom
-- user-event
+The project uses Vitest and React Testing Library for testing application logic and React components.
 
 ## Authentication
 
-The project uses Auth.js / NextAuth.js.
+The project uses Auth.js / NextAuth.js with Google and GitHub OAuth providers and the Prisma Adapter.
 
-Current base setup includes:
+The authentication setup includes:
 
-- `AUTH_SECRET`
-- central `auth.ts`
+- Central `auth.ts` configuration
 - Auth.js Route Handler
 - Prisma Adapter
-- PostgreSQL-backed Auth.js models
+- PostgreSQL-backed sessions
+- Session-based route protection
+- USER and ADMIN roles
+- Server-side authorization checks
 
-Current Auth.js database models:
+### Auth.js Database Models
 
 - User
 - Account
 - Session
 - VerificationToken
 
-Configured OAuth providers:
+### User Lifecycle
 
-- Google
-- GitHub
+User management supports:
 
-Current authorization setup includes:
+- Active and inactive accounts
+- Role updates
+- Session revocation
+- Soft deletion
+- Restoration of archived users
 
-- Session-based protected routes
-- USER and ADMIN roles
-- Server-side role checks with Auth.js
+Deactivating or deleting a user revokes their active sessions.
 
-## Database Architecture
+Restoring an archived user does not automatically reactivate the account.
 
-High-level data flow:
+### Invitation-Only Registration
 
-```text
-UI / Server Component
-        ↓
-Data Layer
-        ↓
-Prisma Client
-        ↓
-PostgreSQL
-```
+New users cannot register through OAuth unless they have a valid invitation.
 
-For mutations:
+The invitation lifecycle is:
 
 ```text
-Form
-  ↓
-Server Action
-  ↓
-Zod validation
-  ↓
-Data Layer / Repository
-  ↓
-Prisma
-  ↓
-PostgreSQL
-  ↓
-revalidatePath / redirect
+Admin creates invitation
+        ↓
+Invitation = PENDING
+        ↓
+User signs in with Google or GitHub
+        ↓
+Auth.js validates invitation
+        ↓
+Auth.js creates User
+        ↓
+First-login onboarding
+        ↓
+User.role = Invitation.role
+        ↓
+Invitation = ACCEPTED
 ```
 
-Prisma access should stay on the server and preferably behind the Data Layer / Repository boundary.
+Invitations support:
+
+- USER / ADMIN role assignment
+- Expiration
+- Renewal
+- Revocation
+- Acceptance tracking
+
+The onboarding logic uses a Prisma transaction to update the user's role and mark the invitation as accepted.
+
+Existing users are authenticated using their account status without requiring a new invitation.
+
+## Application Architecture
+
+The project separates HTTP/UI entry points, business logic, and database access.
+
+### Read Operations
+
+```text
+Server Component / Route Handler
+                ↓
+        Data Layer / Repository
+                ↓
+            Prisma Client
+                ↓
+             PostgreSQL
+```
+
+### Mutation Operations
+
+```text
+Client Form / HTTP Request
+              ↓
+Server Action / Route Handler
+              ↓
+Authentication + Authorization
+              ↓
+         Zod Validation
+              ↓
+          Service Layer
+              ↓
+           Repository
+              ↓
+          Prisma Client
+              ↓
+           PostgreSQL
+```
+
+Not every operation requires a service layer. Simple database operations can use repository functions directly.
+
+### Repository Layer
+
+The repository layer handles database access through Prisma.
+
+Examples:
+
+- `getUsers()`
+- `getUserById()`
+- `getUserByEmail()`
+- `updateUserRoleRecord()`
+- `softDeleteUserRecord()`
+- `getInvitationByEmail()`
+- `createInvitationRecord()`
+
+### Service Layer
+
+The service layer handles business rules and coordinates repository operations.
+
+For example:
+
+```ts
+createOrRenewInvitation(email, role, invitedById)
+```
+
+This service is shared by:
+
+- The invitation Server Action
+- The invitation HTTP API
+
+Both entry points perform their own authentication and authorization checks, then call the shared business logic.
+
+Prisma access remains server-side.
+
+## API — Route Handlers
+
+The application includes custom HTTP endpoints using Next.js App Router Route Handlers.
+
+### User API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/users` | List users with optional filters |
+| GET | `/api/users/[id]` | Retrieve a user by ID |
+| PATCH | `/api/users/[id]` | Update a user's role |
+| DELETE | `/api/users/[id]` | Soft-delete a user |
+
+### Invitation API
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/invitations` | Create or renew an invitation |
+
+The endpoints use session-based authentication and ADMIN authorization.
+
+Supported response statuses include:
+
+- `200 OK`
+- `201 Created`
+- `400 Bad Request`
+- `401 Unauthorized`
+- `403 Forbidden`
+- `404 Not Found`
+- `409 Conflict`
+
+### User Filtering
+
+The users API supports optional query parameters:
+
+```http
+GET /api/users?query=john&role=USER&status=active
+```
+
+Supported parameters:
+
+- `query` — search by name or email
+- `role` — USER or ADMIN
+- `status` — active or inactive
+
+## Caching and Revalidation
+
+The project uses Next.js 16 Cache Components.
+
+Caching is enabled in `next.config.ts`:
+
+```ts
+const nextConfig: NextConfig = {
+  cacheComponents: true,
+};
+```
+
+### Cached Product Queries
+
+Product list data is cached using:
+
+```ts
+"use cache";
+
+cacheLife("hours");
+cacheTag("products");
+```
+
+Query parameters and pagination inputs are part of the cache key.
+
+Individual product queries use dynamic tags:
+
+```ts
+"use cache";
+
+cacheLife("hours");
+cacheTag(`product-${id}`);
+```
+
+### Cache Invalidation
+
+Product mutations can invalidate related cache entries:
+
+```ts
+updateTag("products");
+updateTag(`product-${id}`);
+```
+
+The project also explores these Next.js caching APIs:
+
+| API | Purpose |
+|---|---|
+| `use cache` | Cache function or component results |
+| `cacheLife()` | Configure cache lifetime |
+| `cacheTag()` | Associate cache entries with tags |
+| `updateTag()` | Expire tagged cache after a Server Action |
+| `revalidateTag()` | Mark tagged cache stale for revalidation |
+| `revalidatePath()` | Invalidate a specific route path |
+
+Authentication, authorization decisions, and other security-sensitive data are kept separate from general-purpose cached application data.
 
 ## Product Data Layer
 
-The product feature currently supports:
+The product feature supports:
 
-- fetching all products
-- fetching a single product
-- search
-- category filtering
-- sorting
-- pagination
-- create
-- update
-- delete
+- Fetching product lists
+- Fetching individual products
+- Search
+- Category filtering
+- Sorting
+- Pagination
+- Create
+- Update
+- Delete
+- Cache tagging and invalidation
 
 ## Project Structure
 
-A simplified structure:
+Simplified structure:
 
 ```text
 src/
 ├── app/
 │   ├── api/
-│   │   └── auth/
-│   │       └── [...nextauth]/
+│   │   ├── auth/
+│   │   │   └── [...nextauth]/
+│   │   │       └── route.ts
+│   │   ├── invitations/
+│   │   │   └── route.ts
+│   │   └── users/
+│   │       ├── route.ts
+│   │       └── [id]/
 │   │           └── route.ts
 │   └── dashboard/
+│       ├── products/
+│       └── users/
+│           ├── invitations/
+│           └── archived/
 ├── components/
 │   └── ui/
 ├── generated/
 │   └── prisma/
 ├── lib/
 │   ├── prisma.ts
-│   └── products/
-│       ├── constants.ts
-│       ├── getProduct.ts
-│       ├── getProducts.ts
-│       ├── pagination.ts
-│       ├── productRepository.ts
-│       └── types.ts
+│   ├── products/
+│   │   ├── constants.ts
+│   │   ├── getProduct.ts
+│   │   ├── getProducts.ts
+│   │   ├── pagination.ts
+│   │   ├── productRepository.ts
+│   │   └── types.ts
+│   ├── users/
+│   │   └── userRepository.ts
+│   └── invitations/
+│       ├── invitationRepository.ts
+│       └── invitationService.ts
 └── auth.ts
 
 prisma/
@@ -319,7 +557,9 @@ The repository is also used to practice a work-like Git workflow:
 ```text
 main
   ↓
-feat/... or refactor/... branch
+feature / refactor branch
+  ↓
+implementation
   ↓
 commits
   ↓
@@ -333,10 +573,14 @@ merge
   ↓
 update local main
   ↓
-delete local branch
+delete completed branch
 ```
 
-Conventional Commit prefixes used in this project:
+Each learning feature is developed on a dedicated branch.
+
+### Conventional Commits
+
+Prefixes used in this project:
 
 ```text
 feat:
@@ -344,6 +588,7 @@ fix:
 refactor:
 test:
 chore:
+docs:
 ```
 
 ## Learning Roadmap
@@ -370,9 +615,9 @@ Legend: ✅ Completed · 🚧 In progress · ⏳ Upcoming
 ✅ 16. OAuth — Google + GitHub
 ✅ 17. Session + Protected Routes
 ✅ 18. RBAC — USER / ADMIN
-🚧 19. User Management
-⏳ 20. Route Handlers + Own API
-⏳ 21. Caching + Revalidation + use cache
+✅ 19. User Management + Invitation Onboarding
+✅ 20. Route Handlers + Own API
+✅ 21. Caching + Revalidation + use cache
 ⏳ 22. Parallel Data Fetching + Waterfall Optimization
 ⏳ 23. Advanced Suspense + Streaming Architecture
 ⏳ 24. Start Portfolio Admin Dashboard — New Clean Repository
@@ -391,6 +636,6 @@ Legend: ✅ Completed · 🚧 In progress · ⏳ Upcoming
 
 This repository is not intended to be a finished product.
 
-Its purpose is to provide a safe environment for experimenting with Next.js, PostgreSQL, Prisma, Auth.js, testing, architecture and full-stack development patterns.
+Its purpose is to provide a safe environment for experimenting with Next.js, PostgreSQL, Prisma, Auth.js, testing, architecture, API development, and caching strategies.
 
-After completing the learning roadmap, a separate Admin Dashboard portfolio project will be built using the knowledge and patterns practiced here.
+The next major milestone is a separate, production-oriented Admin Dashboard portfolio project, where these concepts will be applied to a coherent application with a dedicated UI design, real domain models, testing, and deployment.

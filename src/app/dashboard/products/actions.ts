@@ -5,7 +5,7 @@ import {
   deleteProductRecord,
   updateProductRecord,
 } from "@/lib/products/productRepository";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import z from "zod";
 
@@ -85,7 +85,8 @@ export async function updateProduct(
 
   await updateProductRecord({ id, title, description, category, price });
 
-  revalidatePath("/dashboard/products");
+  updateTag("products");
+  updateTag(`product-${id}`);
   redirect("/dashboard/products");
 }
 
