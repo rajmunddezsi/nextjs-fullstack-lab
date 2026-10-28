@@ -7,6 +7,7 @@ import UserStatusButton from "./_components/UserStatusButton";
 import UserDeleteButton from "./_components/UserDeleteButton";
 import InviteUserForm from "./_components/InviteUserForm";
 import { getUsers } from "@/lib/users/userRepository";
+import { getInvitations } from "@/lib/invitations/invitationRepository";
 
 interface UsersPageProps {
   searchParams: Promise<{
@@ -48,13 +49,17 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
     userStatus = false;
   }
 
-  const users = await getUsers(queryString, roleType, userStatus);
+  const [users, invitations] = await Promise.all([
+    getUsers(queryString, roleType, userStatus),
+    getInvitations(),
+  ]);
 
   return (
     <main>
       <h1>Users</h1>
       <InviteUserForm />
       <UserSearch />
+      <div>Total invitations: {invitations.length}</div>
       {users.length === 0 ? (
         <div>No users.</div>
       ) : (
