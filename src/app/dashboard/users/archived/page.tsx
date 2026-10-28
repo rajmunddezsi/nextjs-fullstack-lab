@@ -1,8 +1,8 @@
 import { auth } from "@/auth";
 import { Role } from "@/generated/prisma/enums";
-import getDeletedUsers from "@/lib/users/getDeletedUsers";
 import { redirect } from "next/navigation";
 import UserRestoreButton from "../_components/UserRestoreButton";
+import getDeletedUsers from "@/lib/users/userRepository";
 
 export default async function ArchivedUsersPage() {
   const session = await auth();
