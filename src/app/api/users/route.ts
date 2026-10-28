@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { Role } from "@/generated/prisma/enums";
-import { getUsers } from "@/lib/users/getUsers";
+import { getUsers } from "@/lib/users/userRepository";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {

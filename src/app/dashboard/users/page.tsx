@@ -1,12 +1,12 @@
 import { auth } from "@/auth";
 import { Role } from "@/generated/prisma/enums";
-import { getUsers } from "@/lib/users/getUsers";
 import { redirect } from "next/navigation";
 import UserSearch from "./_components/search/UserSearch";
 import UserRoleSelect from "./_components/UserRoleSelect";
 import UserStatusButton from "./_components/UserStatusButton";
 import UserDeleteButton from "./_components/UserDeleteButton";
 import InviteUserForm from "./_components/InviteUserForm";
+import { getUsers } from "@/lib/users/userRepository";
 
 interface UsersPageProps {
   searchParams: Promise<{
