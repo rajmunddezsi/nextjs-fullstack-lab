@@ -8,7 +8,6 @@ import {
 } from "@/generated/prisma/enums";
 import z from "zod";
 import {
-  getUserByEmail,
   restoreUserRecord,
   softDeleteUserRecord,
   updateUserRoleRecord,
@@ -16,12 +15,11 @@ import {
 } from "@/lib/users/userRepository";
 import { revalidatePath } from "next/cache";
 import {
-  createInvitationRecord,
   getInvitationByEmail,
-  renewInvitationRecord,
   revokeInvitationRecord,
 } from "@/lib/invitations/invitationRepository";
 import type { InvitationFormState } from "@/lib/users/types";
+import { createOrRenewInvitation } from "@/lib/invitations/invitationService";
 
 const updateRoleSchema = z.object({
   id: z.string().min(1),
@@ -189,73 +187,12 @@ export async function createInvitation(
     };
   }
 
-  let message = "";
   const { email, role } = validatedFields.data;
-  const normalizedEmail = email.toLowerCase();
-  const now = new Date();
-  const expiresAt = new Date(now);
-  expiresAt.setDate(expiresAt.getDate() + 7);
-
-  const existingUser = await getUserByEmail(normalizedEmail);
-
-  if (existingUser) {
-    return {
-      success: false,
-      message: "A user with this email already exists!",
-    };
-  }
-
-  const existingInvitation = await getInvitationByEmail(normalizedEmail);
-
-  if (!existingInvitation) {
-    await createInvitationRecord(
-      normalizedEmail,
-      role,
-      expiresAt,
-      session.user.id,
-    );
-
-    message = "Invitation created successfully!";
-  } else {
-    if (existingInvitation.status === InvitationStatus.ACCEPTED) {
-      return {
-        success: false,
-        message: "This invitation has already been accepted.",
-      };
-    }
-
-    if (
-      existingInvitation.status === InvitationStatus.PENDING &&
-      existingInvitation.expiresAt > now
-    ) {
-      return {
-        success: false,
-        message: "An active invitation already exists for this email.",
-      };
-    }
-
-    if (
-      existingInvitation.status === InvitationStatus.REVOKED ||
-      (existingInvitation.status === InvitationStatus.PENDING &&
-        existingInvitation.expiresAt <= now)
-    ) {
-      await renewInvitationRecord(
-        normalizedEmail,
-        role,
-        expiresAt,
-        session.user.id,
-      );
-
-      message = "Invitation has been renewed successfully!";
-    }
-  }
+  const result = await createOrRenewInvitation(email, role, session.user.id);
 
   revalidatePath("/dashboard/users");
 
-  return {
-    success: true,
-    message: message,
-  };
+  return result;
 }
 
 const revokeInvitationSchema = z.object({

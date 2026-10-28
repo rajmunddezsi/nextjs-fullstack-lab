@@ -57,3 +57,17 @@ export async function restoreUserRecord(id: string) {
     data: { deletedAt: null },
   });
 }
+
+export async function getUserById(id: string) {
+  return await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      active: true,
+      createdAt: true,
+    },
+  });
+}
