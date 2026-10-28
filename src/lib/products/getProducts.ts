@@ -1,13 +1,18 @@
-import { Prisma } from "@/generated/prisma/browser";
+import type { Prisma } from "@/generated/prisma/browser";
 import { PRODUCTS_PAGE_SIZE } from "./constants";
 import { calculateSkip } from "./pagination";
 import type { ProductFilters, PaginatedProducts } from "./types";
 import prisma from "../prisma";
+import { cacheLife, cacheTag } from "next/cache";
 
 export async function getProducts(
   filters: ProductFilters,
   currentPage: number,
 ): Promise<PaginatedProducts> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("products");
+
   const { query, category, sort } = filters;
   const skip = calculateSkip(currentPage, PRODUCTS_PAGE_SIZE);
 
